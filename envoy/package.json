@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "start": "run.env envoy"
+  },
+  "dependencies": {
+    "cloudant-envoy": "^0.4.4",
+    "run.env": "^1.0.1"
+  }
+}

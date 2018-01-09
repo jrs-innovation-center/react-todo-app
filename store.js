@@ -5,10 +5,22 @@ import { not, append, reject, propEq, merge } from 'ramda'
 export default createStore(
   combineReducers({
     todos,
-    todo
+    todo,
+    user
   }),
   applyMiddleware(thunk)
 )
+
+function user(state = { username: '', password: '' }, action) {
+  switch (action.type) {
+    case 'CHG_USERNAME':
+      return merge(state, { username: action.payload })
+    case 'CHG_PASSWORD':
+      return merge(state, { password: action.payload })
+    default:
+      return state
+  }
+}
 
 function todos(state = [], action) {
   switch (action.type) {
