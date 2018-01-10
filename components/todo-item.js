@@ -1,7 +1,7 @@
 import React from 'react'
 
 export default ({ description, completed, onToggle, remove }) => (
-  <li className={completed && 'completed'}>
+  <li className={completed ? 'completed' : null}>
     <div className="view">
       <input
         className="toggle"
@@ -12,6 +12,6 @@ export default ({ description, completed, onToggle, remove }) => (
       <label>{description}</label>
       <button className="destroy" onClick={remove} />
     </div>
-    <input className="edit" value="Rule the web" />
+    <input className="edit" value={description} onChange={e => null} />
   </li>
 )

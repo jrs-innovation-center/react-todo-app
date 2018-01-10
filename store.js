@@ -17,6 +17,8 @@ function user(state = { username: '', password: '' }, action) {
       return merge(state, { username: action.payload })
     case 'CHG_PASSWORD':
       return merge(state, { password: action.payload })
+    case 'SET_USER':
+      return action.payload
     default:
       return state
   }
