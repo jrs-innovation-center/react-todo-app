@@ -8,8 +8,8 @@ import Todos from './pages/todos'
 export default () => (
   <BrowserRouter>
     <Switch>
-      <Route path="/todos" component={Todos} />
-      <Route exact path="/" component={Login} />
+      <Route path="/" component={Todos} />
+      <Route exact path="/login" component={Login} />
       <Route path="/signup" component={Signup} />
     </Switch>
   </BrowserRouter>
