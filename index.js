@@ -3,8 +3,8 @@ import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import store from './store'
 import { pluck } from 'ramda'
-
-import { watchChanges } from './dal'
+import auth from './auth'
+import { init } from './dal'
 
 import 'tachyons'
 import 'todomvc-app-css/index.css'
@@ -18,4 +18,9 @@ render(
   document.getElementById('app')
 )
 
-watchChanges('todos')
+if (auth().isAuthenticated) {
+  const dbName = localStorage.getItem('sub')
+  const token = localStorage.getItem('access_token')
+  console.log('token', token)
+  init(dbName, token)
+}

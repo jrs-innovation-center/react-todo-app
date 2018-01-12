@@ -1,16 +1,38 @@
 import React from 'react'
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import { Router, Switch, Route, Redirect } from 'react-router-dom'
+import history from './history'
 
-import Login from './pages/login'
-import Signup from './pages/signup'
 import Todos from './pages/todos'
 
+import auth from './auth'
+
+const appAuth = auth()
+
+function handleAuthentication(nextState) {
+  if (/access_token|id_token|error/.test(nextState.location.hash)) {
+  appAuth.handleAuthentication()
+  }
+
+}
+
 export default () => (
-  <BrowserRouter>
+  <Router history={history}>
     <Switch>
-      <Route path="/" component={Todos} />
-      <Route exact path="/login" component={Login} />
-      <Route path="/signup" component={Signup} />
+      <Route exact path="/" component={props => {
+        return <Todos isAuthenticated={appAuth.isAuthenticated} {...props} />
+      
+      }} />
+      <Route path="/login" component={props => {
+        appAuth.login()
+      }} />
+      <Route path="/logout" component={props => {
+        appAuth.logout()
+        return <Redirect to="/login" />
+      }} />
+      <Route path="/callback" component={props => {
+        handleAuthentication(props)
+        return <h1>Loading...</h1>
+      }} />
     </Switch>
-  </BrowserRouter>
+  </Router>
 )

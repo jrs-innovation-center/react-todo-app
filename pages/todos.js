@@ -1,13 +1,18 @@
 import React from 'react'
 import TodoItem from '../components/todo-item'
 import { map } from 'ramda'
-
+import { Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { addTodo, toggle, remove } from '../actions'
 
-const Todos = props => (
+const Todos = props => {
+  if (!props.isAuthenticated()) {
+    return <Redirect to="/login" />
+  }
+ return (
   <section className="todoapp">
     <header className="header">
+      <Link to="/logout">Logout</Link>
       <h1>todos</h1>
       <form onSubmit={props.addTodo}>
         <input
@@ -58,6 +63,7 @@ const Todos = props => (
     </footer>
   </section>
 )
+}
 
 const mapStateToProps = state => state
 const mapDispatchToProps = dispatch => {
