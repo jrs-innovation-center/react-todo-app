@@ -1,16 +1,13 @@
 import React from 'react'
-import { BrowserRouter, Switch, Route } from 'react-router-dom'
+import { Router, Switch, Route } from 'react-router-dom'
+import history from './history'
 
-import Login from './pages/login'
-import Signup from './pages/signup'
 import Todos from './pages/todos'
 
 export default () => (
-  <BrowserRouter>
+  <Router history={history}>
     <Switch>
-      <Route path="/" component={Todos} />
-      <Route exact path="/login" component={Login} />
-      <Route path="/signup" component={Signup} />
+      <Route exact path="/" component={Todos} />
     </Switch>
-  </BrowserRouter>
+  </Router>
 )

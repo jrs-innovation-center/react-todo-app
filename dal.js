@@ -2,8 +2,32 @@ import PouchDB from 'pouchdb-browser'
 import upsert from 'pouchdb-upsert'
 PouchDB.plugin(upsert)
 import store from './store'
+import { not, merge } from 'ramda'
 
+let db = null
 let feed = null
+
+export const init = (dbName, token) => {
+  db = PouchDB('todos')
+  watchChanges('todos')
+}
+
+export const addTodoItem = doc => {
+  return db.post(doc)
+}
+
+export const toggleComplete = id => {
+  return db.upsert(id, (doc) => {
+    return merge(doc, {
+      completed: not(doc.completed)
+    })
+  })
+}
+
+export const removeTodo = async id => {
+  const doc = await db.get(id)
+  return await db.remove(doc)
+}
 
 export const watchChanges = db => {
   // unsubscribe to feed

@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import store from './store'
 import { pluck } from 'ramda'
 
-import { watchChanges } from './dal'
+import { init } from './dal'
 
 import 'tachyons'
 import 'todomvc-app-css/index.css'
@@ -18,4 +18,5 @@ render(
   document.getElementById('app')
 )
 
-watchChanges('todos')
+// init data
+init()

@@ -1,10 +1,10 @@
 import React from 'react'
 import TodoItem from '../components/todo-item'
-import { map } from 'ramda'
+import { map, sortBy, prop } from 'ramda'
 
 import { connect } from 'react-redux'
 import { addTodo, toggle, remove } from '../actions'
-
+const sortByDescription = sortBy(prop('description'))
 const Todos = props => (
   <section className="todoapp">
     <header className="header">
@@ -32,7 +32,7 @@ const Todos = props => (
               {...item}
             />
           ),
-          props.todos
+          sortByDescription(props.todos)
         )}
       </ul>
     </section>
