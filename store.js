@@ -12,6 +12,8 @@ export default createStore(
 
 function todos(state = [], action) {
   switch (action.type) {
+    case 'SET_TODOS':
+      return action.payload
     case 'REMOVE_TODO':
       return reject(propEq('_id', action.payload._id), state)
     case 'UPSERT_TODO':

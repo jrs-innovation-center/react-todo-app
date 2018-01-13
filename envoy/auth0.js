@@ -50,7 +50,7 @@ module.exports = function() {
       // console.log('[ok] - checking if user is authenticated!')
       jwtCheck(req, res, function(e) {
         if (e) {
-          console.log('error: ', e)
+          //console.log('error: ', e)
           return unauthorized(res)
         }
         req.session.user = req.user

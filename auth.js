@@ -1,7 +1,7 @@
 import auth0 from 'auth0-js'
 import history from './history'
 import { map, __, and, has } from 'ramda'
-import { init } from './dal'
+import { init, cancelSync } from './dal'
 
 export default function () {
   const a0 = new auth0.WebAuth({
@@ -42,13 +42,14 @@ export default function () {
       ['expires_at', expiresAt],
       ['sub', authResult.idTokenPayload.sub]
     ])
-    
+
     init(authResult.idTokenPayload.sub, authResult.accessToken)
     // navigate to the home route
     history.replace('/')
   }
 
   function logout () {
+    cancelSync()
     const rm = k => localStorage.removeItem(k)
     map(rm, [
       'access_token',
