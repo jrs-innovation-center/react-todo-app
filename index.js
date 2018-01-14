@@ -17,10 +17,3 @@ render(
   </Provider>,
   document.getElementById('app')
 )
-
-// init data
-const dbName = window.localStorage.getItem('sub')
-const token = window.localStorage.getItem('access_token')
-if (and(dbName, token)) {
-  init(dbName, token)
-}

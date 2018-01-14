@@ -21,25 +21,28 @@ export default () => (
   </Router>
 )
 
-function secure (Component) {
-  return function (props) {
+function secure(Component) {
+  return function(props) {
     if (not(session.isAuthenticated())) {
       return <Redirect to="/login" />
     }
-    return <Component {...props} />
+    const dbName = window.localStorage.getItem('sub')
+    const token = window.localStorage.getItem('access_token')
+
+    return <Component dbName={dbName} token={token} {...props} />
   }
 }
 
-function Login (props) {
+function Login(props) {
   session.login()
 }
 
-function Logout (props) {
+function Logout(props) {
   session.logout()
   return <Redirect to="/login" />
 }
 
-function Callback (props) {
+function Callback(props) {
   session.handleAuthentication()
   return <h1>Loading...</h1>
 }

@@ -1,6 +1,4 @@
 import PouchDB from 'pouchdb-browser'
-//import upsert from 'pouchdb-upsert'
-//import envoy from './envoy-plugin'
 
 PouchDB.plugin(require('pouchdb-upsert'))
 PouchDB.plugin(require('./envoy-plugin'))
@@ -11,43 +9,55 @@ import { not, merge, pluck } from 'ramda'
 let db = null
 let feed = null
 let remote = null
+let upstream = null
+
+const setRemoteDb = token =>
+  PouchDB(process.env.REMOTE_DB, {
+    prefix: process.env.API,
+    ajax: {
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    }
+  })
 
 export const init = (dbName, token) => {
-  db = PouchDB(dbName)
-  watchChanges()
-
-  sync(token)
-}
-
-export const cancelSync = () => {
+  /**
+  prevent memory leakes ....
+  */
+  if (db) {
+    db = null
+  }
   if (remote) {
     remote = null
   }
-}
 
-export const sync = async token => {
-  if (token) {
-    const HTTPPouch = PouchDB.defaults({
-      prefix: process.env.API,
-      ajax: {
-        headers: {
-          authorization: `Bearer ${token}`
-        }
-      }
-    })
-    remote = HTTPPouch('todos')
+  if (feed) {
+    feed.cancel()
   }
 
-  const summary = await db.pull(remote)
+  if (upstream) {
+    upstream.cancel()
+  }
 
-  db.allDocs({ include_docs: true }).then(res => {
-    const docs = pluck('doc', res.rows)
-    store.dispatch({
-      type: 'SET_TODOS',
-      payload: docs
-    })
-  })
+  db = PouchDB(dbName)
+  remote = setRemoteDb(token)
+
+  // send changes upstream live
+  upstream = db.replicate.to(remote, { live: true, retry: true })
+
+  // get changes downstream
+  sync()
+
+  return watchChanges()
 }
+
+export const sync = () => {
+  return db.pull(remote)
+}
+
+export const allDocs = () =>
+  db.allDocs({ include_docs: true }).then(res => pluck('doc', res.rows))
 
 export const upsert = (id, data) => {
   return db.upsert(id, doc => {
@@ -60,29 +70,12 @@ export const remove = async id => {
   return await db.remove(doc)
 }
 
-export const watchChanges = () => {
-  // unsubscribe to feed
-  if (feed) {
-    feed.cancel()
-  }
+const watchChanges = () => {
   feed = db.changes({ live: true, limit: 1, include_docs: true })
-
   feed.on('change', chg => {
-    db.push(remote).then(res => console.log('REMOTE PUSH', res))
     if (chg.deleted) {
-      // remote
-      //   .remove(chg.doc)
-      //   .then(res => console.log('remove', res))
-      //   .catch(err => console.log('remove-error', err))
-      return store.dispatch({
-        type: 'REMOVE_TODO',
-        payload: chg.doc
-      })
+      return undefined
     }
-
-    store.dispatch({
-      type: 'UPSERT_TODO',
-      payload: chg.doc
-    })
   })
+  return feed
 }

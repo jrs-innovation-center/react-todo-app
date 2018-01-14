@@ -1,28 +1,15 @@
 //import utils from 'pouchdb-utils'
 const utils = require('pouchdb-utils')
-const {
-  pipeP,
-  invoker,
-  prop,
-  reduce,
-  map,
-  path,
-  assoc,
-  keys,
-  compose,
-  pluck,
-  flatten,
-  tap
-} = require('ramda')
+const R = require('ramda')
 
 // pure functions
-const buildDiff = (diffs, row) => assoc(row.id, [row.value.rev], diffs)
-const toId = map(id => ({ id }))
-const getChangedDocs = compose(
-  pluck('ok'),
-  flatten,
-  pluck('docs'),
-  prop('results')
+const buildDiff = (diffs, row) => R.assoc(row.id, [row.value.rev], diffs)
+const toId = R.map(id => ({ id }))
+const getChangedDocs = R.compose(
+  R.pluck('ok'),
+  R.flatten,
+  R.pluck('docs'),
+  R.prop('results')
 )
 
 export const pull = utils.toPromise(function(remote) {
@@ -49,34 +36,26 @@ export const pull = utils.toPromise(function(remote) {
   const addDocsToTemp = docs => temp.bulkDocs({ docs, new_edits: false })
   const replicateToTarget = () => target.replicate.from(temp)
 
-  window.remoteDb = remote
-  // This works great, but does not handle delete documents
-
-  return pipeP(
-    invoker(0, 'allDocs'),
-    prop('rows'),
-    reduce(buildDiff, {}),
+  return R.pipeP(
+    R.invoker(0, 'allDocs'),
+    R.prop('rows'),
+    R.reduce(buildDiff, {}),
     diffs => target.revsDiff(diffs),
-    keys,
+    R.keys,
     toId,
     bulkGet,
     getChangedDocs,
     addDocsToTemp,
     replicateToTarget,
-    tap(() => temp.destroy())
+
+    R.tap(() => temp.destroy())
   )(remote).catch(e => {
     console.log('envoy', e)
     temp.destroy()
   })
 })
 
-// push is an alias for 'replicate.to'
-export const push = utils.toPromise(function(remote) {
-  var target = this
-  return target.replicate.to(remote)
-})
-
 /* istanbul ignore next */
-if (typeof window !== 'undefined' && window.PouchDB) {
-  window.PouchDB.plugin(exports)
-}
+// if (typeof window !== 'undefined' && window.PouchDB) {
+//   window.PouchDB.plugin(exports)
+// }

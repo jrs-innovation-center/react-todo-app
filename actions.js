@@ -1,5 +1,5 @@
 import { merge, not, find, propEq } from 'ramda'
-import { upsert, remove, sync } from './dal'
+import { upsert, remove, sync, allDocs } from './dal'
 
 export const refresh = () => {
   sync()
@@ -20,4 +20,13 @@ export const toggle = id => async (dispatch, getState) => {
 
 export const removeTodo = id => async dispatch => {
   return await upsert(id, { deleted: true })
+}
+
+export const loadTodos = () => dispatch => {
+  allDocs().then(docs => {
+    dispatch({
+      type: 'SET_TODOS',
+      payload: docs
+    })
+  })
 }
