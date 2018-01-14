@@ -1,13 +1,22 @@
 import React from 'react'
 import TodoItem from '../components/todo-item'
-import { map, sortBy, prop } from 'ramda'
-
+import { map, sortBy, prop, reject } from 'ramda'
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { addTodo, toggle, remove } from '../actions'
+import { addTodo, toggle, removeTodo, refresh } from '../actions'
 const sortByDescription = sortBy(prop('description'))
 const Todos = props => (
   <section className="todoapp">
     <header className="header">
+      <button
+        className="fl ba br2 pa2 ma2 link dim black"
+        onClick={props.refresh}
+      >
+        Refresh
+      </button>
+      <Link className="fr ba br2 pa2 ma2 link dim black" to="/logout">
+        Logout
+      </Link>
       <h1>todos</h1>
       <form onSubmit={props.addTodo}>
         <input
@@ -32,7 +41,7 @@ const Todos = props => (
               {...item}
             />
           ),
-          sortByDescription(props.todos)
+          props.todos
         )}
       </ul>
     </section>
@@ -59,9 +68,17 @@ const Todos = props => (
   </section>
 )
 
-const mapStateToProps = state => state
+const mapStateToProps = state => {
+  return {
+    todo: state.todo,
+    todos: sortByDescription(reject(prop('deleted'), state.todos))
+  }
+}
 const mapDispatchToProps = dispatch => {
   return {
+    refresh: e => {
+      dispatch(refresh)
+    },
     change: e => {
       dispatch({ type: 'CHG_DESCRIPTION', payload: e.target.value })
     },
@@ -73,7 +90,7 @@ const mapDispatchToProps = dispatch => {
       dispatch(toggle(id))
     },
     removeTodo: id => e => {
-      dispatch(remove(id))
+      dispatch(removeTodo(id))
     }
   }
 }

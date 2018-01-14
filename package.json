@@ -4,8 +4,10 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
+    "auth0-js": "^9.0.2",
     "pouchdb-browser": "^6.4.1",
     "pouchdb-upsert": "^2.2.0",
+    "pouchdb-utils": "^6.4.1",
     "ramda": "^0.25.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
@@ -13,10 +15,16 @@
     "react-router-dom": "^4.2.2",
     "redux": "^3.7.2",
     "redux-thunk": "^2.2.0",
+    "serve": "^6.4.5",
     "tachyons": "^4.9.1",
     "todomvc-app-css": "^2.1.0"
   },
   "scripts": {
-    "start": "poi"
+    "start": "serve -s dist",
+    "dev": "poi",
+    "build": "poi build"
+  },
+  "devDependencies": {
+    "poi": "^9.6.12"
   }
 }

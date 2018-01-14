@@ -2,7 +2,7 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Provider } from 'react-redux'
 import store from './store'
-import { pluck } from 'ramda'
+import { pluck, and } from 'ramda'
 
 import { init } from './dal'
 
@@ -19,4 +19,8 @@ render(
 )
 
 // init data
-init()
+const dbName = window.localStorage.getItem('sub')
+const token = window.localStorage.getItem('access_token')
+if (and(dbName, token)) {
+  init(dbName, token)
+}

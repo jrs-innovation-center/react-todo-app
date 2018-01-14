@@ -2,15 +2,14 @@ import auth0 from 'auth0-js'
 import history from './history'
 import { map, __, and, has } from 'ramda'
 
-// import { init, cancelSync } from './dal'
+import { init, cancelSync } from './dal'
 
-const { AUTH0_DOMAIN, CLIENTID, REDIRECTURI, AUDIENCE, SCOPE } = process.env
 export default function () {
   const a0 = new auth0.WebAuth({
-    domain: AUTH0_DOMAIN,
-    clientID: CLIENTID,
+    domain: process.env.AUTH0_DOMAIN,
+    clientID: process.env.CLIENTID,
     redirectUri: window.location.origin + '/callback',
-    audience: AUDIENCE,
+    audience: process.env.AUDIENCE,
     responseType: 'token id_token',
     scope: 'openid'
   })
@@ -46,13 +45,13 @@ export default function () {
     ])
 
     // set database and replication
-    // init(authResult.idTokenPayload.sub, authResult.accessToken)
+    init(authResult.idTokenPayload.sub, authResult.accessToken)
     // navigate to the home route
     history.replace('/')
   }
 
   function logout () {
-    //TODO: cancelSync()
+    cancelSync()
     const rm = k => localStorage.removeItem(k)
     map(rm, [
       'access_token',
