@@ -34,10 +34,6 @@ export const init = (dbName, token) => {
   return watchChanges()
 }
 
-export const sync = () => {
-  return db.pull(remote)
-}
-
 export const allDocs = () =>
   db.allDocs({ include_docs: true }).then(res => pluck('doc', res.rows))
 

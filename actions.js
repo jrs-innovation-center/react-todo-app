@@ -1,10 +1,6 @@
 import { merge, not, find, propEq } from 'ramda'
 import { upsert, remove, sync, allDocs } from './dal'
 
-export const refresh = () => {
-  sync()
-}
-
 export const addTodo = async (dispatch, getState) => {
   const todo = getState().todo
   todo._id = new Date().toISOString()

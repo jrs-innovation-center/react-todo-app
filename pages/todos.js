@@ -51,7 +51,7 @@ const Todos = reclass(ctx => {
                   {...item}
                 />
               ),
-              sortByDescription(props.todos)
+              props.todos
             )}
           </ul>
         </section>
