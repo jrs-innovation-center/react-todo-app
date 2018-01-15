@@ -1,51 +1,63 @@
 import PouchDB from 'pouchdb-browser'
-import upsert from 'pouchdb-upsert'
-PouchDB.plugin(upsert)
+
+PouchDB.plugin(require('pouchdb-upsert'))
+
 import store from './store'
-import { not, merge } from 'ramda'
+import { not, merge, pluck } from 'ramda'
 
 let db = null
 let feed = null
+let remote = null
+let upstream = null
 
 export const init = (dbName, token) => {
-  db = PouchDB('todos')
-  watchChanges('todos')
+  /**
+  prevent memory leakes ....
+  */
+  if (db) {
+    db = null
+  }
+  if (remote) {
+    remote = null
+  }
+
+  if (feed) {
+    feed.cancel()
+  }
+
+  if (upstream) {
+    upstream.cancel()
+  }
+
+  db = PouchDB(dbName)
+
+  return watchChanges()
 }
 
-export const addTodoItem = doc => {
-  return db.post(doc)
+export const sync = () => {
+  return db.pull(remote)
 }
 
-export const toggleComplete = id => {
-  return db.upsert(id, (doc) => {
-    return merge(doc, {
-      completed: not(doc.completed)
-    })
+export const allDocs = () =>
+  db.allDocs({ include_docs: true }).then(res => pluck('doc', res.rows))
+
+export const upsert = (id, data) => {
+  return db.upsert(id, doc => {
+    return merge(doc, data)
   })
 }
 
-export const removeTodo = async id => {
+export const remove = async id => {
   const doc = await db.get(id)
   return await db.remove(doc)
 }
 
-export const watchChanges = db => {
-  // unsubscribe to feed
-  if (feed) {
-    feed.cancel()
-  }
-  feed = PouchDB(db).changes({ live: true, limit: 1, include_docs: true })
-
+const watchChanges = () => {
+  feed = db.changes({ live: true, limit: 1, include_docs: true })
   feed.on('change', chg => {
     if (chg.deleted) {
-      return store.dispatch({
-        type: 'REMOVE_TODO',
-        payload: chg.doc
-      })
+      return undefined
     }
-    store.dispatch({
-      type: 'UPSERT_TODO',
-      payload: chg.doc
-    })
   })
+  return feed
 }

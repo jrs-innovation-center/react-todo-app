@@ -1,17 +1,32 @@
-import { merge, not } from 'ramda'
+import { merge, not, find, propEq } from 'ramda'
+import { upsert, remove, sync, allDocs } from './dal'
 
-import { addTodoItem, toggleComplete, removeTodo } from './dal'
+export const refresh = () => {
+  sync()
+}
 
 export const addTodo = async (dispatch, getState) => {
   const todo = getState().todo
-  await addTodoItem(todo)
+  todo._id = new Date().toISOString()
+  await upsert(todo._id, todo)
   dispatch({ type: 'CLEAR_TODO' })
 }
 
-export const toggle = id => async () => {
-  return await toggleComplete(id)
+export const toggle = id => async (dispatch, getState) => {
+  const todo = find(propEq('_id', id), getState().todos)
+  todo.completed = not(todo.completed)
+  return await upsert(id, todo)
 }
 
-export const remove = id => async dispatch => {
-  return await removeTodo(id)
+export const removeTodo = id => async dispatch => {
+  return await upsert(id, { deleted: true })
+}
+
+export const loadTodos = () => dispatch => {
+  allDocs().then(docs => {
+    dispatch({
+      type: 'SET_TODOS',
+      payload: docs
+    })
+  })
 }
