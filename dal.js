@@ -1,6 +1,7 @@
 import PouchDB from 'pouchdb-browser'
 
 PouchDB.plugin(require('pouchdb-upsert'))
+PouchDB.plugin(require('./envoy-plugin'))
 
 import store from './store'
 import { not, merge, pluck } from 'ramda'
@@ -9,6 +10,16 @@ let db = null
 let feed = null
 let remote = null
 let upstream = null
+
+const setRemoteDb = token =>
+  PouchDB(process.env.REMOTE_DB, {
+    prefix: process.env.API,
+    ajax: {
+      headers: {
+        authorization: `Bearer ${token}`
+      }
+    }
+  })
 
 export const init = (dbName, token) => {
   /**
@@ -30,8 +41,17 @@ export const init = (dbName, token) => {
   }
 
   db = PouchDB(dbName)
+  remote = setRemoteDb(token)
+
+  upstream = db.replicate.to(remote, { live: true, retry: true })
+
+  sync()
 
   return watchChanges()
+}
+
+export const sync = () => {
+  return db.pull(remote)
 }
 
 export const allDocs = () =>

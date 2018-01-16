@@ -16,7 +16,8 @@ export default function() {
     login,
     handleAuthentication,
     logout,
-    isAuthenticated
+    isAuthenticated,
+    credentials
   }
 
   function handleAuthentication() {
@@ -48,6 +49,12 @@ export default function() {
 
     // navigate to the home route
     history.replace('/')
+  }
+
+  function credentials() {
+    const token = localStorage.getItem('access_token')
+    const dbName = localStorage.getItem('sub')
+    return { dbName, token }
   }
 
   function logout() {
