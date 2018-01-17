@@ -16,7 +16,15 @@ export default function() {
     login,
     handleAuthentication,
     logout,
-    isAuthenticated
+    isAuthenticated,
+    credentials
+  }
+
+  function credentials() {
+    return {
+      dbName: window.localStorage.getItem('sub'),
+      token: window.localStorage.getItem('access_token')
+    }
   }
 
   function handleAuthentication() {

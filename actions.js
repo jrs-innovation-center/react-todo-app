@@ -26,3 +26,7 @@ export const loadTodos = () => dispatch => {
     })
   })
 }
+
+export const refresh = () => {
+  sync()
+}

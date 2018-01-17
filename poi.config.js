@@ -3,6 +3,8 @@ module.exports = (options, req) => ({
   env: {
     AUTH0_DOMAIN: 'twilson63.auth0.com',
     CLIENTID: 'QXxTJOT2uSRe14nWfznOOO2d6D4MEuI2',
-    AUDIENCE: 'http://localhost:8080'
+    AUDIENCE: 'http://localhost:8080',
+    API: 'https://envoy-todo-svc.now.sh/',
+    REMOTE_DB: 'todos2'
   }
 })

@@ -1,10 +1,11 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import TodoItem from '../components/todo-item'
 import { map, sortBy, prop, reject, and } from 'ramda'
 import reclass from 'reclass'
 import { connect } from 'react-redux'
 import { init } from '../dal'
-import { addTodo, toggle, removeTodo, loadTodos } from '../actions'
+import { addTodo, toggle, removeTodo, loadTodos, refresh } from '../actions'
 const sortByDescription = sortBy(prop('description'))
 
 const Todos = reclass(ctx => {
@@ -14,7 +15,8 @@ const Todos = reclass(ctx => {
   }
   function componentDidMount() {
     const { props } = ctx
-    const ee = init('todos')
+    const { dbName, token } = props
+    const ee = init(dbName, token)
     ee.on('change', chg => {
       if (chg.deleted) {
         return undefined
@@ -27,6 +29,16 @@ const Todos = reclass(ctx => {
     return (
       <section className="todoapp">
         <header className="header">
+          <button
+            className="fl ba br2 pa2 ma2 link dim black"
+            onClick={props.refresh}
+          >
+            Refresh
+          </button>
+          <Link className="fr ba br2 pa2 ma2 link dim black" to="/logout">
+            Logout
+          </Link>
+
           <h1>todos</h1>
           <form onSubmit={props.addTodo}>
             <input
@@ -111,6 +123,9 @@ const mapDispatchToProps = dispatch => {
         type: 'UPSERT_TODO',
         payload: doc
       })
+    },
+    refresh: () => {
+      dispatch(refresh)
     }
   }
 }
